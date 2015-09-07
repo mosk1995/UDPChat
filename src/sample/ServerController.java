@@ -14,6 +14,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -35,6 +37,7 @@ public class ServerController extends Pane {
 
     public static ArrayList<Socket> ConnectionArray = new ArrayList<>();
     public static ArrayList<String> CurrentUsers = new ArrayList<>();
+    public static Map<Socket,String> testMap=new HashMap<>();
 
     public TextField fieldPort;
     public Button buttonStart;
@@ -55,11 +58,13 @@ public class ServerController extends Pane {
     public static void AddUserName(Socket sck) throws IOException {
         Scanner inpt = new Scanner(sck.getInputStream());
         String userNick = inpt.nextLine();
+        testMap.put(sck,userNick);
         CurrentUsers.add(userNick);
         for (int i = 1; i <= ConnectionArray.size(); i++) {
             Socket temp = ConnectionArray.get(i - 1);
             PrintWriter ot = new PrintWriter(temp.getOutputStream());
             ot.println("#?!" + CurrentUsers);
+            System.out.println(" " + CurrentUsers);
             ot.flush();
         }
     }

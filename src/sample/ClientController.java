@@ -104,7 +104,7 @@ public class ClientController extends Pane {
                 enterMessage.setDisable(false);
                 onlineUsers.setDisable(false);
                 sndMsgBtn.setDisable(false);
-                ot = new PrintWriter(sock.getOutputStream());;
+                ot = new PrintWriter(sock.getOutputStream());
                 ot.println(userNick);
                 ot.flush();
                 new Thread(new ClientThread(sock,conversationArea,onlineUsers)).start();

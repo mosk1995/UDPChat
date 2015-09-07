@@ -23,22 +23,30 @@ public class ServerService implements Runnable {
         this.outputData = outputData;
     }
 
-    public void CheckConnection() throws IOException {
+    public void checkConnection() throws IOException {
         if (!sock.isConnected()) {
+            String userNick = null;
             for (int i = 1; i <= ServerController.ConnectionArray.size(); i++) {
-                if (ServerController.ConnectionArray.get(i-1) == sock) {
+                if (ServerController.ConnectionArray.get(i - 1) == sock) {
                     ServerController.ConnectionArray.remove(i);
+                    userNick = ServerController.testMap.get(sock);
+                    ServerController.CurrentUsers.remove(userNick);
+                    ServerController.testMap.remove(sock);
                 }
             }
             for (int i = 1; i <= ServerController.ConnectionArray.size(); i++) {
                 Socket tempSock = ServerController.ConnectionArray.get(i - 1);
                 PrintWriter tempOt = new PrintWriter(tempSock.getOutputStream());
-                tempOt.println(tempSock.getLocalAddress().getHostName() + " disconnected!");
+                tempOt.println(userNick + " disconnected!");
             }
-
+            for (int i = 1; i <= ServerController.ConnectionArray.size(); i++) {
+                Socket temp = ServerController.ConnectionArray.get(i - 1);
+                PrintWriter ot = new PrintWriter(temp.getOutputStream());
+                ot.println("#?!" + ServerController.CurrentUsers);
+                ot.flush();
+            }
         }
     }
-
     public void run() {
         try {
             try {
@@ -46,8 +54,7 @@ public class ServerService implements Runnable {
                 ot = new PrintWriter(sock.getOutputStream());
 
                 while (true) {
-                    CheckConnection();
-
+                    checkConnection();
                     if (!inpt.hasNext()) {
                         return;
                     }
