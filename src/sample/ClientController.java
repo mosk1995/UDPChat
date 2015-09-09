@@ -16,8 +16,8 @@ import javafx.stage.Stage;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -27,22 +27,6 @@ import java.util.Scanner;
 public class ClientController extends Pane {
 
     public static ArrayList<String> JL_ONLINE = new ArrayList<>();
-
-    public ClientController() {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("client.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
-        try {
-            fxmlLoader.load();
-            conversationArea.setDisable(true);
-            disconnectButton.setDisable(true);
-            enterMessage.setDisable(true);
-            onlineUsers.setDisable(true);
-            sndMsgBtn.setDisable(true);
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
-        }
-    }
 
     public Button disconnectButton;
     public TextField enterMessage;
@@ -60,60 +44,95 @@ public class ClientController extends Pane {
     private String host;
     private PrintWriter ot;
 
+    public ClientController() {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("client.fxml"));
+        fxmlLoader.setRoot(this);
+        fxmlLoader.setController(this);
+        try {
+            fxmlLoader.load();
+            conversationArea.setDisable(true);
+            disconnectButton.setDisable(true);
+            enterMessage.setDisable(true);
+            onlineUsers.setDisable(true);
+            sndMsgBtn.setDisable(true);
+            fieldIP.setText("localhost");
+            fieldPortClient.setText("10000");
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+
     @FXML
-    public void handleSendButton(ActionEvent event)
-    {
+    public void handleSendButton(ActionEvent event) {
         try {
             ot = new PrintWriter(sock.getOutputStream());
-        ot.println(userNick + ": " + enterMessage.getText());
-        ot.flush();
-        enterMessage.setText("");
+            ot.println(userNick + ": " + enterMessage.getText());
+            ot.flush();
+            enterMessage.setText("");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     @FXML
-    public void handleDisconnectButton(ActionEvent event) throws IOException
-    {
+    public void handleDisconnectButton(ActionEvent event) throws IOException {
         ot.println(userNick + " has been disconnected!");
         JL_ONLINE.remove(userNick);
         onlineUsers.setText("");
-        for(int i=0;i<JL_ONLINE.size();i++){
-            onlineUsers.appendText(ClientController.JL_ONLINE.get(i)+"\n");
+        for (int i = 0; i < JL_ONLINE.size(); i++) {
+            onlineUsers.appendText(ClientController.JL_ONLINE.get(i) + "\n");
         }
         ot.flush();
         sock.close();
         JOptionPane.showMessageDialog(null, "You disconnected");
         System.exit(0);
     }
+
     @FXML
     public void handleConnectButton(ActionEvent event) {
 
-        if(!fieldNick.getText().equals(""))
-        {
+        if (!fieldNick.getText().equals("")) {
             userNick = fieldNick.getText();
             ///ServerController.CurrentUsers.add(userNick);
             try {
                 port = Integer.valueOf(fieldPortClient.getText());
                 host = fieldIP.getText();
-                sock = new Socket(host, port);
-                conversationArea.appendText("You connected to: " + host + "\n");
-                connectButton.setDisable(true);
-                conversationArea.setDisable(false);
-                disconnectButton.setDisable(false);
-                enterMessage.setDisable(false);
-                onlineUsers.setDisable(false);
-                sndMsgBtn.setDisable(false);
-                ot = new PrintWriter(sock.getOutputStream());
-                ot.println(userNick);
-                ot.flush();
-                new Thread(new ClientThread(sock,conversationArea,onlineUsers)).start();
+
+                //Начало  работы UDP-клиента
+
+                String message = "001" + userNick;
+                DatagramSocket datagramSocket = new DatagramSocket();
+                DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName("localhost"), port);
+                datagramSocket.send(outPacket);
+                byte[] buffer = new byte[512]; //512 позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP, но нихрена не обнспечивает нормальны размер сообщений
+
+                //Ответ от сервера если 002 то отправляем менять ник, если 003 начинаем чатить
+                DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
+                datagramSocket.receive(inPacket);
+                String response = new String(inPacket.getData(), 0, inPacket.getLength());
+                if (response.equals(UDPServerThread.USER_WAS_CONNECTED)) {
+                    System.out.println("Угрожающее всплывающее сообщение");
+                    JOptionPane.showMessageDialog(null, "Пиздуй отсюда, школьник!!!");
+                    fieldNick.setText("");
+                } else
+                if (response.equals(UDPServerThread.USER_CONNECTED_SUCCESSFUL)) {
+                    conversationArea.appendText("You connected to: " + host + "\n");
+                    connectButton.setDisable(true);
+                    conversationArea.setDisable(false);
+                    disconnectButton.setDisable(false);
+                    enterMessage.setDisable(false);
+                    onlineUsers.setDisable(false);
+                    sndMsgBtn.setDisable(false);
+                }
+                System.out.println(response);
+
+                //Конец работы UDP-клиента
+
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Connecting with server failed");
             }
-        }
-        else
-        {
+        } else {
             JOptionPane.showMessageDialog(null, "Please enter the nick!");
         }
     }

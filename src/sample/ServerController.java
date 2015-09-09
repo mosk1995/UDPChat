@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -48,11 +49,11 @@ public class ServerController extends Pane {
         fieldPort.setDisable(true);
         String port = fieldPort.getText();
         if (port.equals("")) {
-            port = "3331";
-            outputData.appendText("Server started with port 3331!\n");
+            port = "10000";
+            outputData.appendText("Server started with port 10000!\n");
         }
         else outputData.appendText("Server started!\n");
-        new Thread(new ServerThread(port, outputData)).start();
+        new Thread(new UDPServerThread(Integer.parseInt(port), outputData)).start();
     }
 
     public static void AddUserName(Socket sck) throws IOException {
