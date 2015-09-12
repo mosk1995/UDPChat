@@ -17,6 +17,7 @@ public class UDPServerThread implements   Runnable{
     private TextArea outputData;
     private ArrayList<Client> connectedUser;
     //Константы внутрисистемных сообщений
+    public static   String MESSAGE="000";
     public static   String USER_WAS_CONNECTED="002";
     public static   String USER_CONNECTED_SUCCESSFUL="003";
 
@@ -58,6 +59,13 @@ public class UDPServerThread implements   Runnable{
                         datagramSocket.send(outPacket);
                     }
 
+                }
+                if (code.equals("000")){
+                    for( Client user :connectedUser) {
+                        DatagramPacket outPacket=new DatagramPacket((MESSAGE+message).getBytes(),(MESSAGE+message).getBytes().length,user.getIp(),user.getPort());
+
+                        datagramSocket.send(outPacket);
+                    }
                 }
                 //outputData.appendText(message);
             }

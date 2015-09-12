@@ -1,8 +1,12 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -12,57 +16,44 @@ import java.util.TreeSet;
 /**
  * Created by Xenomorf on 08.09.2015.
  */
-public class UDPClientThread implements Runnable{
-    private Socket sock;
-    private Scanner inpt;
-    private Scanner send = new Scanner(System.in);
-    private PrintWriter ot;
+public class UDPClientThread implements Runnable {
     private TextArea conversationArea;
     private TextArea onlineUsers;
+    private DatagramSocket datagramSocket;
+    private boolean isOn = false;
 
-    public UDPClientThread(Socket sock, TextArea conversationArea, TextArea onlineUsers) {
-        this.sock = sock;
+    public UDPClientThread(TextArea conversationArea, TextArea onlineUsers, DatagramSocket datagramSocket) {
         this.conversationArea = conversationArea;
         this.onlineUsers = onlineUsers;
+        this.datagramSocket = datagramSocket;
     }
 
     @Override
     public void run() {
-        try {
+        isOn = true;
+        while (isOn) {
+            byte[] buffer = new byte[512];//Данное ограничение позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP
+            DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
+
             try {
-                inpt = new Scanner(sock.getInputStream());
-                ot = new PrintWriter(sock.getOutputStream());
-                ot.flush();
-                while (true) {
-                    if (inpt.hasNext()) {
-                        String MESSAGE = inpt.nextLine();
-
-                        if (MESSAGE.contains("#?!")) {
-                            String TEMP1 = MESSAGE.substring(3);
-                            TEMP1 = TEMP1.replace("[", "");
-                            TEMP1 = TEMP1.replace("]", "");
-                            String[] CurrentUsers = TEMP1.split(", ");
-
-                            for (String s : CurrentUsers) {
-                                ClientController.JL_ONLINE.add(s);
-                            }
-                            Set set = new TreeSet<>(ClientController.JL_ONLINE);
-                            ClientController.JL_ONLINE = new ArrayList<>(set);
-                            onlineUsers.setText("");
-                            for (int i = 0; i < ClientController.JL_ONLINE.size(); i++) {
-                                onlineUsers.appendText(ClientController.JL_ONLINE.get(i) + "\n");
-                            }
-
-                        } else {
-                            conversationArea.appendText(MESSAGE + "\n");
+                datagramSocket.receive(inPacket);
+                String code=new String(inPacket.getData(),0,3);
+                String message=new String(inPacket.getData(),3,inPacket.getLength()-3);
+                System.out.println("Code : "+code +"\nMessage : "+message);
+                if (code.equals(UDPServerThread.MESSAGE)){
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            conversationArea.appendText(message + "\n");
                         }
-                    }
+                    });
+
                 }
-            } finally {
-                sock.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            System.out.println(e);
+
         }
     }
 }
