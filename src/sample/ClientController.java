@@ -63,16 +63,13 @@ public class ClientController extends Pane {
     }
 
 
+    //Обработчик кнопки отправки сообщения
     @FXML
     public void handleSendButton(ActionEvent event) {
-        try {
-            ot = new PrintWriter(sock.getOutputStream());
-            ot.println(userNick + ": " + enterMessage.getText());
-            ot.flush();
+
+            String message=enterMessage.getText();
             enterMessage.setText("");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @FXML
