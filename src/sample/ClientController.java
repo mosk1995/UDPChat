@@ -72,7 +72,7 @@ public class ClientController extends Pane {
             try {
                 DatagramSocket datagramSocket = null;
                 datagramSocket = new DatagramSocket();
-                DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName("localhost"), port);
+                DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName(host), port);
                 datagramSocket.send(outPacket);
             } catch (SocketException e) {
                 e.printStackTrace();
@@ -106,7 +106,7 @@ public class ClientController extends Pane {
 
                 String message = "001" + userNick;
                 DatagramSocket datagramSocket = new DatagramSocket();
-                DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName("localhost"), port);
+                DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName(host), port);
                 datagramSocket.send(outPacket);
                 byte[] buffer = new byte[512]; //512 позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP, но нихрена не обнспечивает нормальны размер сообщений
 

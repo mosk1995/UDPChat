@@ -31,7 +31,7 @@ public class UDPServerThread implements   Runnable{
     public void run() {
 
         try {
-            DatagramSocket datagramSocket= new DatagramSocket(port);
+            DatagramSocket datagramSocket= new DatagramSocket(port,InetAddress.getLocalHost());
 
             while (true) {
                 byte[] buffer=new byte[512];//Данное ограничение позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP
