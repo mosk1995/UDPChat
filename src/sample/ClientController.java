@@ -40,9 +40,8 @@ public class ClientController extends Pane {
 
     private String userNick;
     private int port;
-    private Socket sock;
     private String host;
-    private PrintWriter ot;
+    private UDPClientThread udpClientThread;
 
     public ClientController() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("client.fxml"));
@@ -63,29 +62,33 @@ public class ClientController extends Pane {
     }
 
 
+    //Обработчик кнопки отправки сообщения
     @FXML
     public void handleSendButton(ActionEvent event) {
-        try {
-            ot = new PrintWriter(sock.getOutputStream());
-            ot.println(userNick + ": " + enterMessage.getText());
-            ot.flush();
-            enterMessage.setText("");
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        String message = enterMessage.getText();
+        if (!message.equals("")) {
+            message = "000" + message;
+            try {
+                DatagramSocket datagramSocket = null;
+                datagramSocket = new DatagramSocket();
+                DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName("localhost"), port);
+                datagramSocket.send(outPacket);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
+        enterMessage.setText("");
+
     }
 
     @FXML
     public void handleDisconnectButton(ActionEvent event) throws IOException {
-        ot.println(userNick + " has been disconnected!");
-        JL_ONLINE.remove(userNick);
-        onlineUsers.setText("");
-        for (int i = 0; i < JL_ONLINE.size(); i++) {
-            onlineUsers.appendText(ClientController.JL_ONLINE.get(i) + "\n");
-        }
-        ot.flush();
-        sock.close();
-        JOptionPane.showMessageDialog(null, "You disconnected");
         System.exit(0);
     }
 
@@ -115,8 +118,7 @@ public class ClientController extends Pane {
                     System.out.println("Угрожающее всплывающее сообщение");
                     JOptionPane.showMessageDialog(null, "Пиздуй отсюда, школьник!!!");
                     fieldNick.setText("");
-                } else
-                if (response.equals(UDPServerThread.USER_CONNECTED_SUCCESSFUL)) {
+                } else if (response.equals(UDPServerThread.USER_CONNECTED_SUCCESSFUL)) {
                     conversationArea.appendText("You connected to: " + host + "\n");
                     connectButton.setDisable(true);
                     conversationArea.setDisable(false);
@@ -124,6 +126,9 @@ public class ClientController extends Pane {
                     enterMessage.setDisable(false);
                     onlineUsers.setDisable(false);
                     sndMsgBtn.setDisable(false);
+                    udpClientThread=new UDPClientThread(conversationArea,onlineUsers,datagramSocket);
+                    new Thread(udpClientThread).start();
+
                 }
                 System.out.println(response);
 
