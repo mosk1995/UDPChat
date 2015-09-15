@@ -63,7 +63,7 @@ public class UDPServerThread implements   Runnable{
                 if (code.equals("000")){
                     for( Client user :connectedUser) {
                         DatagramPacket outPacket=new DatagramPacket((MESSAGE+message).getBytes(),(MESSAGE+message).getBytes().length,user.getIp(),user.getPort());
-
+                        System.out.println(connectedUser.toString());
                         datagramSocket.send(outPacket);
                     }
                 }
