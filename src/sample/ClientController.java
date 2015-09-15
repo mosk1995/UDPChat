@@ -42,6 +42,7 @@ public class ClientController extends Pane {
     private int port;
     private String host;
     private UDPClientThread udpClientThread;
+    DatagramSocket datagramSocket;
 
     public ClientController() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("client.fxml"));
@@ -70,8 +71,6 @@ public class ClientController extends Pane {
         if (!message.equals("")) {
             message = "000" + message;
             try {
-                DatagramSocket datagramSocket = null;
-                datagramSocket = new DatagramSocket();
                 DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName(host), port);
                 datagramSocket.send(outPacket);
             } catch (SocketException e) {
@@ -105,7 +104,7 @@ public class ClientController extends Pane {
                 //Начало  работы UDP-клиента
 
                 String message = "001" + userNick;
-                DatagramSocket datagramSocket = new DatagramSocket();
+                datagramSocket = new DatagramSocket();
                 DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName(host), port);
                 datagramSocket.send(outPacket);
                 byte[] buffer = new byte[512]; //512 позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP, но нихрена не обнспечивает нормальны размер сообщений
