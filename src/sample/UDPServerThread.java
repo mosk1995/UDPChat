@@ -6,7 +6,12 @@ import javafx.scene.control.TextArea;
 
 import java.io.IOException;
 import java.net.*;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 
 /**
@@ -20,6 +25,7 @@ public class UDPServerThread implements   Runnable{
     public static   String MESSAGE="000";
     public static   String USER_WAS_CONNECTED="002";
     public static   String USER_CONNECTED_SUCCESSFUL="003";
+    public static   boolean SERVER_IS_WORK=true;
 
     public UDPServerThread(int port, TextArea outputData){
         this.port=port;
@@ -33,10 +39,11 @@ public class UDPServerThread implements   Runnable{
         try {
             DatagramSocket datagramSocket= new DatagramSocket(port,InetAddress.getLocalHost());
 
-            while (true) {
+            while (SERVER_IS_WORK) {
                 byte[] buffer=new byte[512];//Данное ограничение позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP
                 DatagramPacket inPacket=new DatagramPacket(buffer,buffer.length);
                 datagramSocket.receive(inPacket);
+                Calendar reseivedTime= Calendar.getInstance();
                 InetAddress clientAdress=inPacket.getAddress();
                 int clientPort=inPacket.getPort();
                 String code=new String(inPacket.getData(),0,3);
@@ -60,10 +67,22 @@ public class UDPServerThread implements   Runnable{
                     }
 
                 }
-                if (code.equals("000")){
-                    for( Client user :connectedUser) {
-                        DatagramPacket outPacket=new DatagramPacket((MESSAGE+message).getBytes(),(MESSAGE+message).getBytes().length,user.getIp(),user.getPort());
 
+                if (code.equals("000")){
+
+                    String sendersNick="";
+                    for( Client user :connectedUser) {
+                        System.out.println("Client with nick : \"" + user.getNick() + "\",ip : "+user.getIp()+" , port : "+user.getPort());
+                        System.out.println("Message address "+clientAdress+" port "+clientPort);
+                        if (user.getIp().equals(clientAdress)&&(clientPort==user.getPort())) {
+                            sendersNick=user.getNick();
+                        }
+                    }
+                    SimpleDateFormat sdf= new SimpleDateFormat("dd.mm.yy HH:mm:ss");
+                    String sentedMessage=MESSAGE+sdf.format(reseivedTime.getTime())+" "+sendersNick+" :"+message;
+                    for( Client user :connectedUser) {
+                        DatagramPacket outPacket=new DatagramPacket(sentedMessage.getBytes(),sentedMessage.getBytes().length,user.getIp(),user.getPort());
+                        System.out.println(connectedUser.toString());
                         datagramSocket.send(outPacket);
                     }
                 }
