@@ -39,10 +39,11 @@ public class ClientController extends Pane {
     public TextField fieldNick;
 
     private String userNick;
-    private int port;
-    private String host;
+    public static int port;
+    public static  String host;
     private UDPClientThread udpClientThread;
     DatagramSocket datagramSocket;
+
 
     public ClientController() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("client.fxml"));
@@ -55,7 +56,8 @@ public class ClientController extends Pane {
             enterMessage.setDisable(true);
             onlineUsers.setDisable(true);
             sndMsgBtn.setDisable(true);
-            fieldIP.setText("localhost");
+            fieldNick.setText("asd");
+            fieldIP.setText("192.168.56.1");
             fieldPortClient.setText("10000");
         } catch (IOException exception) {
             throw new RuntimeException(exception);
@@ -69,7 +71,7 @@ public class ClientController extends Pane {
 
         String message = enterMessage.getText();
         if (!message.equals("")) {
-            message = "000" + message;
+            message = "000" + fieldNick.getText() + ": " + message;
             try {
                 DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName(host), port);
                 datagramSocket.send(outPacket);
@@ -118,6 +120,7 @@ public class ClientController extends Pane {
                     JOptionPane.showMessageDialog(null, "Пиздуй отсюда, школьник!!!");
                     fieldNick.setText("");
                 } else if (response.equals(UDPServerThread.USER_CONNECTED_SUCCESSFUL)) {
+                    new Thread(new ClientBackground()).start();
                     conversationArea.appendText("You connected to: " + host + "\n");
                     connectButton.setDisable(true);
                     conversationArea.setDisable(false);
@@ -125,7 +128,7 @@ public class ClientController extends Pane {
                     enterMessage.setDisable(false);
                     onlineUsers.setDisable(false);
                     sndMsgBtn.setDisable(false);
-                    udpClientThread=new UDPClientThread(conversationArea,onlineUsers,datagramSocket);
+                    udpClientThread = new UDPClientThread(conversationArea, onlineUsers, datagramSocket);
                     new Thread(udpClientThread).start();
 
                 }
