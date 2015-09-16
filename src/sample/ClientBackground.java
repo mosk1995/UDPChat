@@ -40,17 +40,17 @@ public class ClientBackground implements Runnable {
             DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
             try {
                 try {
+                    String code = new String(inPacket.getData(), 0, 3);
+                    System.out.println("Server ping me!");
+                    if (code.equals("012")) {
+                        DatagramPacket outPacket = new DatagramPacket("012".getBytes(), "012".getBytes().length, InetAddress.getByName(ClientController.host), ClientController.port + 1);
+                        datagramSocket.send(outPacket);
+                    }
                     datagramSocket.receive(inPacket);
                 }
                 catch (SocketTimeoutException e){
                     System.out.println("SERVER WAS DOWN!");
                     break;
-                }
-                String code = new String(inPacket.getData(), 0, 3);
-                System.out.println("Server ping me!");
-                if (code.equals("012")) {
-                    DatagramPacket outPacket = new DatagramPacket("012".getBytes(), "012".getBytes().length, InetAddress.getByName(ClientController.host), ClientController.port + 1);
-                    datagramSocket.send(outPacket);
                 }
 
             } catch (IOException e) {
