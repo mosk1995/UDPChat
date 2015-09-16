@@ -71,7 +71,7 @@ public class ClientController extends Pane {
 
         String message = enterMessage.getText();
         if (!message.equals("")) {
-            message = "000" + fieldNick.getText() + ": " + message;
+            message = "000" + message;
             try {
                 DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName(host), port);
                 datagramSocket.send(outPacket);

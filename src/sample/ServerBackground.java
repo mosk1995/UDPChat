@@ -11,6 +11,7 @@ public class ServerBackground implements Runnable {
     private int port;
     private DatagramSocket datagramSocket;
     private String USER_PING = "012";
+    public static boolean isWork = true;
 
     ServerBackground(int port) {
         this.port = port + 1;
@@ -28,12 +29,12 @@ public class ServerBackground implements Runnable {
     @Override
     public void run() {
         try {
-            datagramSocket.setSoTimeout(500);
+            datagramSocket.setSoTimeout(1);
         } catch (SocketException e) {
             e.printStackTrace();
             System.out.println("Exception#3 on ServerBackground");
         }
-        while (true) {
+        while (isWork) {
             try {
                 String code;
 //                byte[] buffer = new byte[512];
@@ -50,28 +51,29 @@ public class ServerBackground implements Runnable {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                if (ServerController.connectedUser.size() != 0) {
+               // if (ServerController.connectedUser.size() != 0) {
                     for (Client user : ServerController.connectedUser) {
                         System.out.println("foreach " + ServerController.connectedUser.size());
                         DatagramPacket outPacket = new DatagramPacket(USER_PING.getBytes(), USER_PING.getBytes().length, user.getIp(), 6789);
                         byte[] buffer = new byte[512];
                         DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
                         datagramSocket.send(outPacket);
+                        System.out.println("send ++");
                         try {
                             datagramSocket.receive(inPacket);
-                        }
-                        catch (SocketTimeoutException e){
+                            System.out.println("receive " + ServerController.connectedUser.size());
+                            code = new String(inPacket.getData(), 0, 3);
+                            if (code.equals(USER_PING)) {
+                                System.out.println(user.getNick() + " response on ping!");
+                            }
+                        } catch (SocketTimeoutException e) {
+                            System.out.println(user.getNick()+"not response on ping!");
                             ServerController.connectedUser.remove(user);
                             break;
                         }
-                        System.out.println("receive " + ServerController.connectedUser.size());
-                        code = new String(inPacket.getData(), 0, 3);
-                        if (code.equals(USER_PING)) {
-                            System.out.println(user.getNick() + " response on ping!");
-                        }
-                        System.out.println("END OF FOR");
+                        System.out.println("END FOREACH");
                     }
-                }
+               // }
             } catch (IOException e) {
                 e.printStackTrace();
             }

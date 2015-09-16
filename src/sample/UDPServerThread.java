@@ -20,11 +20,12 @@ import java.util.TimeZone;
 public class UDPServerThread implements Runnable {
     private int port;
     private TextArea outputData;
+
     //Константы внутрисистемных сообщений
-    public static   String MESSAGE="000";
-    public static   String USER_WAS_CONNECTED="002";
-    public static   String USER_CONNECTED_SUCCESSFUL="003";
-    public static   boolean SERVER_IS_WORK=true;
+    public static String MESSAGE = "000";
+    public static String USER_WAS_CONNECTED = "002";
+    public static String USER_CONNECTED_SUCCESSFUL = "003";
+    public static boolean SERVER_IS_WORK = true;
 
     public UDPServerThread(int port, TextArea outputData) {
         this.port = port;
@@ -33,20 +34,20 @@ public class UDPServerThread implements Runnable {
 
     @Override
     public void run() {
-     new Thread(new ServerBackground(port)).start();
+        new Thread(new ServerBackground(port)).start();
         try {
             DatagramSocket datagramSocket = new DatagramSocket(port, InetAddress.getLocalHost());
             while (SERVER_IS_WORK) {
-                byte[] buffer=new byte[512];//Данное ограничение позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP
-                DatagramPacket inPacket=new DatagramPacket(buffer,buffer.length);
+                byte[] buffer = new byte[512];//Данное ограничение позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP
+                DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
                 datagramSocket.receive(inPacket);
-                Calendar reseivedTime= Calendar.getInstance();
-                InetAddress clientAdress=inPacket.getAddress();
-                int clientPort=inPacket.getPort();
-                String code=new String(inPacket.getData(),0,3);
-                String message=new String(inPacket.getData(),3,inPacket.getLength()-3);
-                System.out.println("Code : "+code +"\nMessage : "+message);
-				
+                Calendar reseivedTime = Calendar.getInstance();
+                InetAddress clientAdress = inPacket.getAddress();
+                int clientPort = inPacket.getPort();
+                String code = new String(inPacket.getData(), 0, 3);
+                String message = new String(inPacket.getData(), 3, inPacket.getLength() - 3);
+                System.out.println("Code : " + code + "\nMessage : " + message);
+
                 if (code.equals("001")) {
                     boolean isOk = true;
                     for (Client user : ServerController.connectedUser) {
@@ -66,20 +67,20 @@ public class UDPServerThread implements Runnable {
 
                 }
                 if (code.equals("000")) {
-                    
 
-                    String sendersNick="";
-						for (Client user : ServerController.connectedUser) {
-                        System.out.println("Client with nick : \"" + user.getNick() + "\",ip : "+user.getIp()+" , port : "+user.getPort());
-                        System.out.println("Message address "+clientAdress+" port "+clientPort);
-                        if (user.getIp().equals(clientAdress)&&(clientPort==user.getPort())) {
-                            sendersNick=user.getNick();
+
+                    String sendersNick = "";
+                    for (Client user : ServerController.connectedUser) {
+                        System.out.println("Client with nick : \"" + user.getNick() + "\",ip : " + user.getIp() + " , port : " + user.getPort());
+                        System.out.println("Message address " + clientAdress + " port " + clientPort);
+                        if (user.getIp().equals(clientAdress) && (clientPort == user.getPort())) {
+                            sendersNick = user.getNick();
                         }
                     }
-                    SimpleDateFormat sdf= new SimpleDateFormat("dd.mm.yy HH:mm:ss");
-                    String sentedMessage=MESSAGE+sdf.format(reseivedTime.getTime())+" "+sendersNick+" :"+message;
+                    SimpleDateFormat sdf = new SimpleDateFormat("[HH:mm:ss]");
+                    String sentedMessage = MESSAGE + sdf.format(reseivedTime.getTime()) + " " + sendersNick + " :" + message;
                     for (Client user : ServerController.connectedUser) {
-                        DatagramPacket outPacket=new DatagramPacket(sentedMessage.getBytes(),sentedMessage.getBytes().length,user.getIp(),user.getPort());
+                        DatagramPacket outPacket = new DatagramPacket(sentedMessage.getBytes(), sentedMessage.getBytes().length, user.getIp(), user.getPort());
                         datagramSocket.send(outPacket);
                     }
                 }
