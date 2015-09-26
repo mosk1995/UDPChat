@@ -120,7 +120,7 @@ public class ClientController extends Pane {
                     JOptionPane.showMessageDialog(null, "Пиздуй отсюда, школьник!!!");
                     fieldNick.setText("");
                 } else if (response.equals(UDPServerThread.USER_CONNECTED_SUCCESSFUL)) {
-                    new Thread(new ClientBackground()).start();
+                    new Thread(new ClientBackground(onlineUsers)).start();
                     conversationArea.appendText("You connected to: " + host + "\n");
                     connectButton.setDisable(true);
                     conversationArea.setDisable(false);
