@@ -36,7 +36,7 @@ public class ClientBackground implements Runnable {
             e.printStackTrace();
         }
         while (true) {
-            byte[] buffer = new byte[512];//Данное ограничение позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP
+            byte[] buffer = new byte[512];//Р”Р°РЅРЅРѕРµ РѕРіСЂР°РЅРёС‡РµРЅРёРµ РїРѕР·РІРѕР»СЏРµС‚ РЅР°Рј РіР°СЂР°РЅС‚РёСЂРѕРІР°С‚СЊ РєРѕСЂСЂРµРєС‚РЅС‹Р№ РїСЂРёС‘Рј Р»СЋР±С‹Рј С…РѕСЃС‚РѕРј СЃРј. https://ru.wikipedia.org/wiki/UDP
             DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
             try {
                 try {
