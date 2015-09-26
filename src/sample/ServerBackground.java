@@ -11,7 +11,7 @@ public class ServerBackground implements Runnable {
     private int port;
     private DatagramSocket datagramSocket;
     private String USER_PING = "012";
-    public static boolean isWork = true;
+    public static boolean IS_WORK = true;
 
     ServerBackground(int port) {
         this.port = port + 1;
@@ -34,7 +34,7 @@ public class ServerBackground implements Runnable {
             e.printStackTrace();
             System.out.println("Exception#3 on ServerBackground");
         }
-        while (isWork) {
+        while (IS_WORK) {
             try {
                 String code;
 //                byte[] buffer = new byte[512];
