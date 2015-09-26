@@ -54,14 +54,14 @@ public class ServerBackground implements Runnable {
                 // if (ServerController.connectedUser.size() != 0) {
                 for (Client user : ServerController.connectedUser) {
                     System.out.println("foreach " + ServerController.connectedUser.size());
-                    StringBuilder str1 = new StringBuilder();
+                    StringBuilder listUsers = new StringBuilder();
                     for (Client u : ServerController.connectedUser) {
-                        str1.append(u.getNick());
-                        str1.append("\n");
+                        listUsers.append(u.getNick());
+                        listUsers.append("\n");
                     }
-                    String str = String.valueOf(str1);
-                    System.out.println(str);
-                    DatagramPacket outPacket = new DatagramPacket((USER_PING + str).getBytes(), (USER_PING + str).getBytes().length, user.getIp(), 6789);
+                    String dataUsers = String.valueOf(listUsers);
+                    //System.out.println(str);
+                    DatagramPacket outPacket = new DatagramPacket((USER_PING + dataUsers).getBytes(), (USER_PING + dataUsers).getBytes().length, user.getIp(), 6789);
                     byte[] buffer = new byte[512];
                     DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
                     datagramSocket.send(outPacket);
