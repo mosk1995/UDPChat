@@ -13,6 +13,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.BindException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.*;
 
@@ -44,13 +47,26 @@ public class ServerController extends Pane {
 
     @FXML
     public void handleStartButton(ActionEvent event) throws IOException {
-        fieldPort.setDisable(true);
-        String port = fieldPort.getText();
-        if (port.equals("")) {
-            port = "10000";
-            outputData.appendText("Server started with port 10000!\n");
-        } else outputData.appendText("Server started!\n");
-        new Thread(new UDPServerThread(Integer.parseInt(port), outputData)).start();
+        //
+        String port_s = fieldPort.getText();
+        int port;
+        try {
+            if (port_s.equals("")) {
+                port = 10000;
+            }else {
+                port = Integer.parseInt(port_s);
+            }
+            DatagramSocket testSocket=new DatagramSocket(port, InetAddress.getLocalHost());
+            testSocket.close();
+
+            outputData.appendText("Сервер запущен на порте " +port+" !\n");
+            new Thread(new UDPServerThread(port, outputData)).start();
+            fieldPort.setDisable(true);
+        } catch (NumberFormatException e) {
+            outputData.appendText("Введите корректное значение порта!!!\n");
+        } catch (BindException e) {
+            outputData.appendText("Порт занят введите другое значение!!!\n");
+        }
     }
 
 //    public static void AddUserName(Socket sck) throws IOException {

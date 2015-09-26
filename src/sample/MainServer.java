@@ -17,11 +17,11 @@ public class MainServer extends Application {
         stage.setHeight(423);
         stage.setResizable(false);
         stage.show();
-//        stage.setOnCloseRequest(event -> {
-//            UDPServerThread.SERVER_IS_WORK = false;
-//            ServerBackground.isWork = false;
-//            event.consume();
-//        });
+        stage.setOnCloseRequest(event -> {
+            UDPServerThread.SERVER_IS_WORK = false;
+            ServerBackground.isWork = false;
+            System.out.println("Сервер завершил свою работу");
+        });
 
     }
 
