@@ -2,7 +2,9 @@ package sample;
 
 import com.sun.org.apache.xpath.internal.SourceTree;
 import javafx.application.Platform;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.net.*;
@@ -13,11 +15,30 @@ import java.net.*;
 public class ClientBackground implements Runnable {
     private int port;
     private DatagramSocket datagramSocket;
+    private Button disconnectButton;
+    private TextField enterMessage;
     private TextArea onlineUsers;
-    public static boolean IS_WORK=true;
+    private Button sndMsgBtn;
+    private Button connectButton;
+    private TextField fieldPortClient;
+    private TextField fieldIP;
+    private TextArea conversationArea;
+    private TextField fieldNick;
+    public static boolean IS_WORK = true;
+    private DatagramSocket mainSocket;
 
-    ClientBackground(TextArea onlineUsers) {
+    ClientBackground(TextArea onlineUsers, Button disconnectButton, Button connectButton, TextField enterMessage, TextField fieldIP,
+                     TextField fieldNick, TextField fieldPortClient, Button sndMsgBtn, TextArea conversationArea, DatagramSocket mainSocket) {
         this.port = 6789;
+        this.sndMsgBtn = sndMsgBtn;
+        this.conversationArea = conversationArea;
+        this.disconnectButton = disconnectButton;
+        this.connectButton = connectButton;
+        this.enterMessage = enterMessage;
+        this.fieldIP = fieldIP;
+        this.fieldNick = fieldNick;
+        this.fieldPortClient = fieldPortClient;
+        this.mainSocket = mainSocket;
         try {
             this.datagramSocket = new DatagramSocket(port, InetAddress.getLocalHost());
         } catch (SocketException e) {
@@ -54,6 +75,22 @@ public class ClientBackground implements Runnable {
                         datagramSocket.send(outPacket);
                     }
                 } catch (SocketTimeoutException e) {
+                    Platform.runLater(() -> {
+                        connectButton.setDisable(false);
+                        conversationArea.setDisable(true);
+                        disconnectButton.setDisable(true);
+                        enterMessage.setDisable(true);
+                        onlineUsers.setDisable(true);
+                        sndMsgBtn.setDisable(true);
+                        //mainSocket.close();
+                    });
+//                    conversationArea.setDisable(true);
+//                    disconnectButton.setDisable(true);
+//                    enterMessage.setDisable(true);
+//                    onlineUsers.setDisable(true);
+//                    sndMsgBtn.setDisable(true);
+                    //mainSocket.close();
+                    Thread.currentThread().stop();
                     System.out.println("SERVER WAS DOWN!");
                     break;
                 }
