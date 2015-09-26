@@ -29,7 +29,7 @@ public class ServerBackground implements Runnable {
     @Override
     public void run() {
         try {
-            datagramSocket.setSoTimeout(1);
+            datagramSocket.setSoTimeout(500);
         } catch (SocketException e) {
             e.printStackTrace();
             System.out.println("Exception#3 on ServerBackground");
@@ -51,29 +51,36 @@ public class ServerBackground implements Runnable {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-               // if (ServerController.connectedUser.size() != 0) {
-                    for (Client user : ServerController.connectedUser) {
-                        System.out.println("foreach " + ServerController.connectedUser.size());
-                        DatagramPacket outPacket = new DatagramPacket(USER_PING.getBytes(), USER_PING.getBytes().length, user.getIp(), 6789);
-                        byte[] buffer = new byte[512];
-                        DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
-                        datagramSocket.send(outPacket);
-                        System.out.println("send ++");
-                        try {
-                            datagramSocket.receive(inPacket);
-                            System.out.println("receive " + ServerController.connectedUser.size());
-                            code = new String(inPacket.getData(), 0, 3);
-                            if (code.equals(USER_PING)) {
-                                System.out.println(user.getNick() + " response on ping!");
-                            }
-                        } catch (SocketTimeoutException e) {
-                            System.out.println(user.getNick()+"not response on ping!");
-                            ServerController.connectedUser.remove(user);
-                            break;
-                        }
-                        System.out.println("END FOREACH");
+                // if (ServerController.connectedUser.size() != 0) {
+                for (Client user : ServerController.connectedUser) {
+                    System.out.println("foreach " + ServerController.connectedUser.size());
+                    StringBuilder str1 = new StringBuilder();
+                    for (Client u : ServerController.connectedUser) {
+                        str1.append(u.getNick());
+                        str1.append("\n");
                     }
-               // }
+                    String str = String.valueOf(str1);
+                    System.out.println(str);
+                    DatagramPacket outPacket = new DatagramPacket((USER_PING + str).getBytes(), (USER_PING + str).getBytes().length, user.getIp(), 6789);
+                    byte[] buffer = new byte[512];
+                    DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
+                    datagramSocket.send(outPacket);
+                    System.out.println("send ++");
+                    try {
+                        datagramSocket.receive(inPacket);
+                        System.out.println("receive " + ServerController.connectedUser.size());
+                        code = new String(inPacket.getData(), 0, 3);
+                        if (code.equals(USER_PING)) {
+                            System.out.println(user.getNick() + " response on ping!");
+                        }
+                    } catch (SocketTimeoutException e) {
+                        System.out.println(user.getNick() + "not response on ping!");
+                        ServerController.connectedUser.remove(user);
+                        break;
+                    }
+                    System.out.println("END FOREACH");
+                }
+                // }
             } catch (IOException e) {
                 e.printStackTrace();
             }
