@@ -14,6 +14,7 @@ public class ClientBackground implements Runnable {
     private int port;
     private DatagramSocket datagramSocket;
     private TextArea onlineUsers;
+    public static boolean IS_WORK=true;
 
     ClientBackground(TextArea onlineUsers) {
         this.port = 6789;
@@ -36,7 +37,8 @@ public class ClientBackground implements Runnable {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        while (true) {
+        while (IS_WORK) {
+            System.out.println(IS_WORK);
             byte[] buffer = new byte[512];//Данное ограничение позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP
             DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
             try {

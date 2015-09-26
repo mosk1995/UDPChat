@@ -39,7 +39,6 @@ public class UDPServerThread implements Runnable {
             DatagramSocket datagramSocket = new DatagramSocket(port, InetAddress.getLocalHost());
             datagramSocket.setSoTimeout(500);
             while (SERVER_IS_WORK) {
-                System.out.println(SERVER_IS_WORK);
                 byte[] buffer = new byte[512];//Данное ограничение позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP
                 DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
                 try {
@@ -89,7 +88,7 @@ public class UDPServerThread implements Runnable {
                         }
                     }
                 } catch (SocketTimeoutException e) {
-                    System.out.println("Немного подождём");
+
                 }
                 //outputData.appendText(message);
             }

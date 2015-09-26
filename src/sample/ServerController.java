@@ -37,9 +37,6 @@ public class ServerController extends Pane {
     }
 
     public static volatile ArrayList<Client> connectedUser = new ArrayList<>();
-//    public static ArrayList<Socket> ConnectionArray = new ArrayList<>();
-//    public static ArrayList<String> CurrentUsers = new ArrayList<>();
-//    public static Map<Socket, String> testMap = new HashMap<>();
 
     public TextField fieldPort;
     public Button buttonStart;
@@ -47,7 +44,6 @@ public class ServerController extends Pane {
 
     @FXML
     public void handleStartButton(ActionEvent event) throws IOException {
-        //
         String port_s = fieldPort.getText();
         int port;
         try {
@@ -62,24 +58,11 @@ public class ServerController extends Pane {
             outputData.appendText("Сервер запущен на порте " +port+" !\n");
             new Thread(new UDPServerThread(port, outputData)).start();
             fieldPort.setDisable(true);
+            buttonStart.setDisable(true);
         } catch (NumberFormatException e) {
             outputData.appendText("Введите корректное значение порта!!!\n");
         } catch (BindException e) {
             outputData.appendText("Порт занят введите другое значение!!!\n");
         }
     }
-
-//    public static void AddUserName(Socket sck) throws IOException {
-//        Scanner inpt = new Scanner(sck.getInputStream());
-//        String userNick = inpt.nextLine();
-//        testMap.put(sck, userNick);
-//        CurrentUsers.add(userNick);
-//        for (int i = 1; i <= ConnectionArray.size(); i++) {
-//            Socket temp = ConnectionArray.get(i - 1);
-//            PrintWriter ot = new PrintWriter(temp.getOutputStream());
-//            ot.println("#?!" + CurrentUsers);
-//            System.out.println(" " + CurrentUsers);
-//            ot.flush();
-//        }
-//    }
 }

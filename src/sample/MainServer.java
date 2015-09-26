@@ -1,10 +1,8 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class MainServer extends Application {
 
@@ -19,7 +17,7 @@ public class MainServer extends Application {
         stage.show();
         stage.setOnCloseRequest(event -> {
             UDPServerThread.SERVER_IS_WORK = false;
-            ServerBackground.isWork = false;
+            ServerBackground.IS_WORK = false;
             System.out.println("Сервер завершил свою работу");
         });
 
