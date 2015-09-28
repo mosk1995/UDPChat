@@ -26,15 +26,18 @@ public class UDPClientThread implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("Client started");
         try {
             datagramSocket.setSoTimeout(500);
             while (IS_WORK) {
                 byte[] buffer = new byte[512];//Данное ограничение позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP
                 DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
-
+                System.out.println("Client work");
 
                 try {
+                    System.out.println("1");
                     datagramSocket.receive(inPacket);
+                    System.out.println("2");
                     String code = new String(inPacket.getData(), 0, 3);
                     String message = new String(inPacket.getData(), 3, inPacket.getLength() - 3);
                     System.out.println("Code : " + code + "\nMessage : " + message);
@@ -59,5 +62,7 @@ public class UDPClientThread implements Runnable {
         } catch (SocketException e) {
             e.printStackTrace();
         }
+        System.out.println("____________________STOPED______________________");
+        Thread.currentThread().stop();
     }
 }

@@ -130,6 +130,7 @@ public class ClientController extends Pane {
                     sndMsgBtn.setDisable(false);
                     udpClientThread = new UDPClientThread(conversationArea, onlineUsers, datagramSocket);
                     new Thread(udpClientThread).start();
+                    UDPClientThread.IS_WORK = true;
 
                 }
                 System.out.println(response);

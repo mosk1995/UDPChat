@@ -19,22 +19,19 @@ import java.net.SocketException;
 public class MainClient extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception{
-        if (!isRun()){
-            ClientController clientController=new ClientController();
+    public void start(Stage stage) throws Exception {
+        if (!isRun()) {
+            ClientController clientController = new ClientController();
             stage.setScene(new Scene(clientController));
             stage.setTitle("Chat by Mikant and Xenomorf");
             stage.setWidth(627);
             stage.setHeight(437);
             stage.setResizable(false);
             stage.show();
-            stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent event) {
-                    UDPClientThread.IS_WORK=false;
-                    ClientBackground.IS_WORK=false;
-                    System.out.println("Клиент завершил свою работу");
-                }
+            stage.setOnCloseRequest((event) -> {
+                UDPClientThread.IS_WORK = false;
+                ClientBackground.IS_WORK = false;
+                System.out.println("Клиент завершил свою работу");
             });
         } else {
             Text text1 = new Text(20, 30, "Приложение уже запущено!!!");
@@ -42,9 +39,9 @@ public class MainClient extends Application {
             text1.setFont(new Font(20));
             text2.setFont(new Font(15));
 
-            Scene scene = new Scene(new Group(text1,text2));
+            Scene scene = new Scene(new Group(text1, text2));
 
-            stage.setTitle("Welcome to JavaFX!");
+            stage.setTitle("Ошибочка вышла!");
             stage.setScene(scene);
             stage.setResizable(false);
             stage.sizeToScene();
@@ -53,9 +50,9 @@ public class MainClient extends Application {
 
     }
 
-    private boolean isRun(){
+    private boolean isRun() {
         try {
-            DatagramSocket ds=new DatagramSocket(6789);
+            DatagramSocket ds = new DatagramSocket(6789);
             ds.close();
             return false;
         } catch (SocketException e) {

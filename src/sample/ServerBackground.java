@@ -37,21 +37,11 @@ public class ServerBackground implements Runnable {
         while (IS_WORK) {
             try {
                 String code;
-//                byte[] buffer = new byte[512];
-//                DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
-//                datagramSocket.receive(inPacket);
-//                InetAddress clientAdress = inPacket.getAddress();
-//                int clientPort = inPacket.getPort();
-//                String code = new String(inPacket.getData(), 0, 3);
-//                String message = new String(inPacket.getData(), 3, inPacket.getLength() - 3);
-//                System.out.println("Code : " + code + "\nMessage : " + message);
-                //System.out.println("ServiceThread"+ServerController.connectedUser.size());
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                // if (ServerController.connectedUser.size() != 0) {
                 for (Client user : ServerController.connectedUser) {
                     System.out.println("foreach " + ServerController.connectedUser.size());
                     StringBuilder listUsers = new StringBuilder();
@@ -60,7 +50,6 @@ public class ServerBackground implements Runnable {
                         listUsers.append("\n");
                     }
                     String dataUsers = String.valueOf(listUsers);
-                    //System.out.println(str);
                     DatagramPacket outPacket = new DatagramPacket((USER_PING + dataUsers).getBytes(), (USER_PING + dataUsers).getBytes().length, user.getIp(), 6789);
                     byte[] buffer = new byte[512];
                     DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
@@ -80,7 +69,6 @@ public class ServerBackground implements Runnable {
                     }
                     System.out.println("END FOREACH");
                 }
-                // }
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -25,11 +25,12 @@ public class UDPServerThread implements Runnable {
     public static String MESSAGE = "000";
     public static String USER_WAS_CONNECTED = "002";
     public static String USER_CONNECTED_SUCCESSFUL = "003";
-    public static boolean SERVER_IS_WORK = true;
+    public static boolean SERVER_IS_WORK;
 
     public UDPServerThread(int port, TextArea outputData) {
         this.port = port;
         this.outputData = outputData;
+        this.SERVER_IS_WORK = true;
     }
 
     @Override
@@ -83,6 +84,9 @@ public class UDPServerThread implements Runnable {
                         SimpleDateFormat sdf = new SimpleDateFormat("[HH:mm:ss]");
                         String sentedMessage = MESSAGE + sdf.format(reseivedTime.getTime()) + " " + sendersNick + " :" + message;
                         for (Client user : ServerController.connectedUser) {
+                            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            System.out.println("Client with nick : \"" + user.getNick() + "\",ip : " + user.getIp() + " , port : " + user.getPort());
+                            System.out.println("Message address " + clientAdress + " port " + clientPort);
                             DatagramPacket outPacket = new DatagramPacket(sentedMessage.getBytes(), sentedMessage.getBytes().length, user.getIp(), user.getPort());
                             datagramSocket.send(outPacket);
                         }

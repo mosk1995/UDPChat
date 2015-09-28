@@ -90,9 +90,11 @@ public class ClientBackground implements Runnable {
 //                    onlineUsers.setDisable(true);
 //                    sndMsgBtn.setDisable(true);
                     //mainSocket.close();
-                    Thread.currentThread().stop();
                     System.out.println("SERVER WAS DOWN!");
-                    break;
+                    UDPClientThread.IS_WORK = false;
+                    this.datagramSocket.close();
+                    Thread.currentThread().stop();
+                    //break;
                 }
 
             } catch (IOException e) {
