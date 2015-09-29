@@ -43,6 +43,7 @@ public class ServerBackground implements Runnable {
                     Thread.currentThread().interrupt();
                 }
                 for (Client user : ServerController.connectedUser) {
+                    System.out.println("SIZE:" + ServerController.connectedUser.size());
                     System.out.println("foreach " + ServerController.connectedUser.size());
                     StringBuilder listUsers = new StringBuilder();
                     for (Client u : ServerController.connectedUser) {

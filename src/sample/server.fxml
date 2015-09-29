@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
-<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="423.0" prefWidth="279.0" type="Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="410.0" prefWidth="425.0" type="Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Button fx:id="buttonStart" layoutX="111.0" layoutY="360.0" mnemonicParsing="false" onAction="#handleStartButton" prefHeight="25.0" prefWidth="149.0" text="Start!" />
-      <Label layoutX="19.0" layoutY="301.0" text="Enter the port:" />
-      <TextField fx:id="fieldPort" layoutX="106.0" layoutY="297.0" />
-      <TextArea fx:id="outputData" editable="false" layoutX="19.0" layoutY="14.0" prefHeight="273.0" prefWidth="252.0" />
+      <Button fx:id="buttonStart" layoutX="264.0" layoutY="371.0" mnemonicParsing="false" onAction="#handleStartButton" prefHeight="25.0" prefWidth="149.0" text="Start!" />
+      <Label layoutX="187.0" layoutY="267.0" text="Enter the port:" />
+      <TextField fx:id="fieldPort" layoutX="264.0" layoutY="263.0" />
+      <TextArea fx:id="outputData" editable="false" layoutX="19.0" layoutY="14.0" prefHeight="242.0" prefWidth="394.0" />
+      <Label layoutX="103.0" layoutY="305.0" text="Nick:" />
+      <TextField fx:id="fieldNick" layoutX="134.0" layoutY="301.0" prefHeight="25.0" prefWidth="120.0" />
+      <Button fx:id="buttonGetList" layoutX="14.0" layoutY="371.0" mnemonicParsing="false" onAction="#getList" prefHeight="25.0" prefWidth="120.0" text="Get list of banned" />
+      <Button fx:id="buttonIP" layoutX="262.0" layoutY="335.0" mnemonicParsing="false" onAction="#changeStateIP" prefHeight="25.0" prefWidth="149.0" text="Change state" />
+      <Button fx:id="buttonNick" layoutX="262.0" layoutY="301.0" mnemonicParsing="false" onAction="#changeStateName" prefHeight="25.0" prefWidth="149.0" text="Change state" />
+      <Label layoutX="101.0" layoutY="339.0" text="IP:" />
+      <TextField fx:id="fieldIP" layoutX="134.0" layoutY="335.0" prefHeight="25.0" prefWidth="120.0" />
    </children>
 </fx:root>

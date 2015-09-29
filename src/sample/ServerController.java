@@ -9,14 +9,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.BindException;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.io.*;
+import java.net.*;
 import java.util.*;
 
 /**
@@ -36,11 +30,18 @@ public class ServerController extends Pane {
         }
     }
 
-    public static volatile ArrayList<Client> connectedUser = new ArrayList<>();
+    public static volatile Vector<Client> connectedUser = new Vector<>();
 
     public TextField fieldPort;
+    public TextField fieldNick;
+    public TextField fieldIP;
     public Button buttonStart;
     public TextArea outputData;
+    public Button buttonNick;
+    public Button buttonIP;
+    public Button buttonGetList;
+    private ArrayList<InetAddress> bannedIP = new ArrayList<>();
+    private ArrayList<String> bannedName = new ArrayList<>();
 
     @FXML
     public void handleStartButton(ActionEvent event) throws IOException {
@@ -49,13 +50,13 @@ public class ServerController extends Pane {
         try {
             if (port_s.equals("")) {
                 port = 10000;
-            }else {
+            } else {
                 port = Integer.parseInt(port_s);
             }
-            DatagramSocket testSocket=new DatagramSocket(port, InetAddress.getLocalHost());
+            DatagramSocket testSocket = new DatagramSocket(port, InetAddress.getLocalHost());
             testSocket.close();
 
-            outputData.appendText("Сервер запущен на порте " +port+" !\n");
+            outputData.appendText("Сервер запущен на порте " + port + " !\n");
             new Thread(new UDPServerThread(port, outputData)).start();
             fieldPort.setDisable(true);
             buttonStart.setDisable(true);
@@ -64,5 +65,139 @@ public class ServerController extends Pane {
         } catch (BindException e) {
             outputData.appendText("Порт занят введите другое значение!!!\n");
         }
+    }
+
+    @FXML
+    public void getList(ActionEvent event) {
+        File bannedNameFile = new File("bannedName");
+        File bannedIPFile = new File("bannedIP");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(bannedNameFile))) {
+
+            String sCurrentLine;
+            outputData.appendText("List of banned users:\n");
+            while ((sCurrentLine = br.readLine()) != null) {
+                outputData.appendText(sCurrentLine + "\n");
+                System.out.println(sCurrentLine);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(bannedIPFile))) {
+
+            String sCurrentLine;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                //sCurrentLine = sCurrentLine.replace("/", "");
+                outputData.appendText(String.valueOf(InetAddress.getByName(sCurrentLine)) + "\n");
+                System.out.println(sCurrentLine);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void changeStateName() throws FileNotFoundException {
+        getBannedUser();
+        String name = fieldNick.getText();
+        boolean inBannedNames = false;
+        for (String bNames : bannedName) {
+            if (name.equals(bNames)) {
+                inBannedNames = true;
+                bannedName.remove(bNames);
+                bannedName.trimToSize();
+                break;
+            }
+        }
+        if (!inBannedNames) {
+            bannedName.add(name);
+            for (Client t : connectedUser) {
+                if (t.getNick().equals(name)) {
+                    connectedUser.remove(t);
+                    System.out.println("__________________________________" + connectedUser.size());
+                    connectedUser.trimToSize();
+                    break;
+                }
+            }
+
+        }
+        PrintWriter writer = new PrintWriter(new File("bannedName"));
+        for (int i = 0; i < bannedName.size(); i++) {
+            writer.print(bannedName.get(i) + "\n");
+        }
+        writer.close();
+        getBannedUser();
+    }
+
+    @FXML
+    public void changeStateIP() throws FileNotFoundException, UnknownHostException {
+        getBannedUser();
+        String ip = fieldIP.getText();
+        boolean inBannedNames = false;
+        for (InetAddress bIP : bannedIP) {
+            if (InetAddress.getByName(ip).equals(bIP)) {
+                inBannedNames = true;
+                bannedIP.remove(bIP);
+                bannedIP.trimToSize();
+
+                break;
+            }
+        }
+        if (!inBannedNames) {
+            bannedIP.add(InetAddress.getByName(ip));
+            for (Client t : connectedUser) {
+                if (t.getIp().equals(InetAddress.getByName(ip))) {
+                    connectedUser.remove(t);
+                    connectedUser.trimToSize();
+                    break;
+                }
+            }
+        }
+        PrintWriter writer = new PrintWriter(new File("bannedIP"));
+        for (int i = 0; i < bannedIP.size(); i++) {
+            //String temp= String.valueOf(bannedIP.get(i)).replace("/","");
+
+            writer.print(String.valueOf(bannedIP.get(i)).replace("/", "") + "\n");
+        }
+        writer.close();
+    }
+
+    private void getBannedUser() {
+
+        String content = null;
+        bannedIP.clear();
+        bannedName.clear();
+        File bannedNameFile = new File("bannedName");
+        File bannedIPFile = new File("bannedIP");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(bannedNameFile))) {
+
+            String sCurrentLine;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                bannedName.add(sCurrentLine);
+                System.out.println(sCurrentLine);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(bannedIPFile))) {
+
+            String sCurrentLine;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                bannedIP.add(InetAddress.getByName(sCurrentLine));
+                System.out.println(sCurrentLine);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
