@@ -28,6 +28,7 @@ public class ClientController extends Pane {
 
     public static ArrayList<String> JL_ONLINE = new ArrayList<>();
 
+
     public Button disconnectButton;
     public TextField enterMessage;
     public TextArea onlineUsers;
@@ -57,7 +58,7 @@ public class ClientController extends Pane {
             onlineUsers.setDisable(true);
             sndMsgBtn.setDisable(true);
             fieldNick.setText("asd");
-            fieldIP.setText("192.168.56.1");
+            fieldIP.setText("172.18.7.15");
             fieldPortClient.setText("10000");
         } catch (IOException exception) {
             throw new RuntimeException(exception);
@@ -93,6 +94,7 @@ public class ClientController extends Pane {
         System.exit(0);
     }
 
+
     @FXML
     public void handleConnectButton(ActionEvent event) {
 
@@ -110,7 +112,7 @@ public class ClientController extends Pane {
                 DatagramPacket outPacket = new DatagramPacket(message.getBytes(), message.getBytes().length, InetAddress.getByName(host), port);
                 datagramSocket.send(outPacket);
                 byte[] buffer = new byte[512]; //512 позволяет нам гарантировать корректный приём любым хостом см. https://ru.wikipedia.org/wiki/UDP, но нихрена не обнспечивает нормальны размер сообщений
-
+                datagramSocket.setSoTimeout(2000);
                 //Ответ от сервера если 002 то отправляем менять ник, если 003 начинаем чатить
                 DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
                 datagramSocket.receive(inPacket);
@@ -131,9 +133,11 @@ public class ClientController extends Pane {
                     udpClientThread = new UDPClientThread(conversationArea, onlineUsers, datagramSocket);
                     new Thread(udpClientThread).start();
                     UDPClientThread.IS_WORK = true;
-
                 }
-                System.out.println(response);
+                if (response.equals("005")) {
+                    JOptionPane.showMessageDialog(null, "Вы забанены, обратитесь к админу!!!");
+                } else
+                    System.out.println(response);
 
                 //Конец работы UDP-клиента
 
