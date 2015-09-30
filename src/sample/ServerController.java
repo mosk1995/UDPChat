@@ -40,6 +40,7 @@ public class ServerController extends Pane {
     public Button buttonNick;
     public Button buttonIP;
     public Button buttonGetList;
+    public Button buttonConnectedUser;
     private ArrayList<InetAddress> bannedIP = new ArrayList<>();
     private ArrayList<String> bannedName = new ArrayList<>();
 
@@ -67,36 +68,11 @@ public class ServerController extends Pane {
         }
     }
 
+
+
     @FXML
     public void getList(ActionEvent event) {
-        File bannedNameFile = new File("bannedName");
-        File bannedIPFile = new File("bannedIP");
-
-        try (BufferedReader br = new BufferedReader(new FileReader(bannedNameFile))) {
-
-            String sCurrentLine;
-            outputData.appendText("List of banned users:\n");
-            while ((sCurrentLine = br.readLine()) != null) {
-                outputData.appendText(sCurrentLine + "\n");
-                System.out.println(sCurrentLine);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try (BufferedReader br = new BufferedReader(new FileReader(bannedIPFile))) {
-
-            String sCurrentLine;
-
-            while ((sCurrentLine = br.readLine()) != null) {
-                //sCurrentLine = sCurrentLine.replace("/", "");
-                outputData.appendText(String.valueOf(InetAddress.getByName(sCurrentLine)) + "\n");
-                System.out.println(sCurrentLine);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        printBannedUser();
     }
 
     @FXML
@@ -129,7 +105,7 @@ public class ServerController extends Pane {
             writer.print(bannedName.get(i) + "\n");
         }
         writer.close();
-        getBannedUser();
+        printBannedUser();
     }
 
     @FXML
@@ -163,6 +139,50 @@ public class ServerController extends Pane {
             writer.print(String.valueOf(bannedIP.get(i)).replace("/", "") + "\n");
         }
         writer.close();
+        printBannedUser();
+    }
+
+    @FXML
+    public void showConnectedUser(){
+        outputData.appendText("Connected users :\n");
+        for (Client t : connectedUser) {
+            outputData.appendText(t.getNick()+"\n"+t.getIp().toString()+"\n"+t.getPort()+"\n\n");
+        }
+        outputData.appendText("----------------------------------------------\n");
+    }
+
+    private void printBannedUser(){
+        File bannedNameFile = new File("bannedName");
+        File bannedIPFile = new File("bannedIP");
+        outputData.appendText("List of banned Names:\n");
+        try (BufferedReader br = new BufferedReader(new FileReader(bannedNameFile))) {
+
+            String sCurrentLine;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                outputData.appendText(sCurrentLine + "\n");
+                System.out.println(sCurrentLine);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        outputData.appendText("----------------------------------------------\n");
+        outputData.appendText("List of banned IP's:\n");
+        try (BufferedReader br = new BufferedReader(new FileReader(bannedIPFile))) {
+
+            String sCurrentLine;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                //sCurrentLine = sCurrentLine.replace("/", "");
+                outputData.appendText(String.valueOf(InetAddress.getByName(sCurrentLine)) + "\n");
+                System.out.println(sCurrentLine);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        outputData.appendText("----------------------------------------------\n");
     }
 
     private void getBannedUser() {
