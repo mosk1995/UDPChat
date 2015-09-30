@@ -23,7 +23,7 @@ public class MainClient extends Application {
         if (!isRun()) {
             ClientController clientController = new ClientController();
             stage.setScene(new Scene(clientController));
-            stage.setTitle("Chat by Mikant and Xenomorf");
+            stage.setTitle("Chat");
             stage.setWidth(627);
             stage.setHeight(437);
             stage.setResizable(false);

@@ -119,7 +119,7 @@ public class ClientController extends Pane {
                 String response = new String(inPacket.getData(), 0, inPacket.getLength());
                 if (response.equals(UDPServerThread.USER_WAS_CONNECTED)) {
                     System.out.println("Угрожающее всплывающее сообщение");
-                    JOptionPane.showMessageDialog(null, "Пиздуй отсюда, школьник!!!");
+                    JOptionPane.showMessageDialog(null, "Вы уже были присоединены!!!");
                     fieldNick.setText("");
                 } else if (response.equals(UDPServerThread.USER_CONNECTED_SUCCESSFUL)) {
                     new Thread(new ClientBackground(onlineUsers, disconnectButton, connectButton, enterMessage, fieldIP, fieldNick, fieldPortClient, sndMsgBtn, conversationArea, datagramSocket)).start();

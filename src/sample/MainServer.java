@@ -10,7 +10,7 @@ public class MainServer extends Application {
     public void start(Stage stage) throws Exception {
         ServerController serverController = new ServerController();
         stage.setScene(new Scene(serverController));
-        stage.setTitle("Sign in");
+        stage.setTitle("Server");
         stage.setWidth(440);
         stage.setHeight(440);
         stage.setResizable(false);
